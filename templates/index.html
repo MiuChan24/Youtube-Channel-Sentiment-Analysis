@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube Sentiment Analysis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fef6f9;
+            margin: 40px;
+            color: #444;
+        }
+
+        h1 {
+            color: #ff6f91;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            width: 350px;
+            font-size: 16px;
+            border: 2px solid #ffd3e0;
+            border-radius: 8px;
+            background-color: #fff0f5;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ffb6b9;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #ff6f91;
+        }
+
+        pre {
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ffd3e0;
+            border-radius: 8px;
+            max-width: 600px;
+            overflow-x: auto;
+            margin-top: 20px;
+            font-size: 15px;
+            color: #333;
+        }
+
+        img {
+            max-width: 500px;
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>💬 Analyze YouTube Channel Comments</h1>
+    <p>Enter a YouTube Channel ID to analyze the sentiment of recent video comments:</p>
+
+    <input type="text" id="channelId" placeholder="e.g., UCIC2zvfbkgrBDU5uOGqF2g" />
+    <button onclick="analyze()">Analyze</button>
+
+    <h3>Results:</h3>
+    <pre id="output">Results will appear here...</pre>
+
+    <h3>Sentiment Charts</h3>
+<div style="display: flex; gap: 30px; align-items: flex-start;">
+    <img id="barChart" src="" alt="Bar Chart" />
+    <img id="pieChart" src="" alt="Pie Chart" />
+</div>
+
+
+    <script>
+        async function analyze() {
+            const channelId = document.getElementById("channelId").value;
+            const res = await fetch("/analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ channelId })
+            });
+            const data = await res.json();
+
+            document.getElementById("output").textContent = JSON.stringify(data.sentiment_counts, null, 2);
+
+            document.getElementById("barChart").src = data.plot_path;
+            document.getElementById("barChart").style.display = "block";
+
+            const piePath = data.plot_path.replace(".png", "_pie.png");
+            document.getElementById("pieChart").src = piePath;
+            document.getElementById("pieChart").style.display = "block";
+        }
+    </script>
+</body>
+</html>
